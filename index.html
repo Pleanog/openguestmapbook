@@ -18,33 +18,58 @@
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
 
-    <style>
-    </style>
-
 
 </head>
 
 <body>
 
 
-
+    
     <div id="map"></div>
-    <script>
 
-        let listofclicks = []
+<script>
+
+        var lastSelectedPosition;
+        var lastSendPosition ;
 
         window.onload = function () {
-                drawVisitors(listofclicks);
-            };
-      
+            let listofvisitors = getDatainDatabase();
+            drawVisitors(listofvisitors);
+        };      
 
-        function drawVisitors(listofclicks) {
-            listofclicks.forEach(function (e, index) {
-                L.marker([listofclicks[index].lat, listofclicks[index].lng]).addTo(map)
+        function drawVisitors(listofvisitors) {
+            listofvisitors.forEach(function (e, index) {
+                L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
             });
         }
 
+        function getDatainDatabase(){
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("GET", 'http://ogmb.kirtz.eu/entries.php', false); // false for synchronous request
+            xmlHttp.send(null);
+            return xmlHttp.responseText;
+        }
+
+        function saveDatainDatabase(){
+                console.log(lastSelectedPosition);
+                console.log(lastSendPosition);
+            if (lastSelectedPosition == lastSendPosition){
+                console.log("verboten")
+            } else {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", 'http://ogmb.kirtz.eu/create_entry.php', true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+            xhr.send(lastSelectedPosition);
+            lastSendPosition = lastSelectedPosition;
+            }
+        }
+
+        function savecurrentPosition(position){
+            lastSelectedPosition = position;
+        }
+
         var map = L.map('map').setView([49.261101, 7.359755], 18);
+
 
         var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
             maxZoom: 18,
@@ -56,33 +81,19 @@
         }).addTo(map);
 
         var marker = L.marker([49.261101, 7.359755]).addTo(map)
-            .bindPopup('<b>Hochschule Kaiserslautern</b><br />I am a popup.').openPopup();
-
-
-        function onMapClick(e) {
-            popup
-                .setLatLng(e.latlng)
-                .setContent('You clicked the map at ' + e.latlng.toString())
-                .openOn(map);
-        }
+            .bindPopup('<b>Hochschule Kaiserslautern</b>').openPopup();
 
         var popup = L.popup();
 
             function onMapClick(e) {
+                
+                savecurrentPosition(e.latlng)
+
                 popup
                     .setLatLng(e.latlng)
-                    .setContent("You clicked the map at " + e.latlng.toString())
+                    .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>ja</button>")
                     .openOn(map);
-
-                listofclicks.push(e.latlng)
-                console.log(listofclicks)
-
-
-                drawVisitors(listofclicks)
-
             }
-
-        
 
         map.on('click', onMapClick);
 
