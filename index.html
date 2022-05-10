@@ -48,7 +48,7 @@
 
         window.onload = function () {
             let listofvisitors = getDatainDatabase();
-            drawVisitors(listofvisitors);
+            drawVisitors(JSON.parse(listofvisitors).data);
         };
 
         function drawVisitors(listofvisitors) {
@@ -60,7 +60,7 @@
 
         function getDatainDatabase(){
             var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("GET", 'http://ogmb.kirtz.eu/entries.php', false); // false for synchronous request
+            xmlHttp.open("GET", '/read_entry.php', false); // false for synchronous request
             xmlHttp.send(null);
             return xmlHttp.responseText;
         }
@@ -70,14 +70,22 @@
                 alert('Bitte eine Position auf der Karte auswählen');
             } else if (!madeEntry){
                 if (lastSelectedPosition == lastSendPosition){
-                    console.log("Es kann nur ein Eintrag an der selben Stelle getaetigt werden")
+                    console.log("Es kann nur ein Eintrag an der selben Stelle getaetigt werden");
                 } else {
-                    const name = document.getElementById('name').value
-                    const message = document.getElementById('message').value
-                    var xhr = new XMLHttpRequest();
-                    xhr.open("POST", 'http://ogmb.kirtz.eu/create_entry.php', true);
-                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-                    xhr.send(lastSelectedPosition, name, message);
+                    const name = document.getElementById('name').value;
+                    const message = document.getElementById('message').value;
+
+                    let formData = new FormData();
+
+                    formData.append("name", name);
+                    formData.append("lat", lastSelectedPosition.lat);
+                    formData.append("lng", lastSelectedPosition.lng);
+                    formData.append("message", message);
+
+                    let request = new XMLHttpRequest();
+                    request.open("POST", "/create_entry.php");
+                    request.send(formData);
+
                     lastSendPosition = lastSelectedPosition;
                     L.marker([lastSelectedPosition.lat, lastSelectedPosition.lng]).addTo(map)
                         .bindPopup('<strong>' + name + '</strong>' + '<br>' + message); 
