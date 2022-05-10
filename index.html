@@ -31,12 +31,13 @@
         <div class="guestbook-form">
             <form action="/action_page.php">
                 <label for="name">Name (optional)</label><br>
-                <input type="text" id="name" name="name" value=""><br>
+                <input type="text" id="name" name="name" value="" maxlength="50"><br>
                 <label for="message">Nachricht (optional):</label><br>
                 <textarea type="text" id="message" name="message" maxlength="300"></textarea>
                 <input class="submit-button" type="button" value="Speichern" onclick="saveDatainDatabase()">
             </form>
         </div>
+        <div id="info">Bitte einen Punkt auf der Karte auswählen, mit dem Sie sich ins Gästebuch eintragen wollen:</div>
         <div id="map"></div>
     </div>
 
@@ -66,11 +67,14 @@
         }
 
         function saveDatainDatabase(){
+            document.getElementById("info").classList.remove('alert', 'succes', 'tip');
             if(lastSelectedPosition == undefined){
-                alert('Bitte eine Position auf der Karte auswählen');
+                document.getElementById("info").classList.add('tip');
+                document.getElementById('info').innerHTML = '<strong>Info:</strong> Bitte eine Position auf der Karte auswählen!';                
             } else if (!madeEntry){
                 if (lastSelectedPosition == lastSendPosition){
-                    console.log("Es kann nur ein Eintrag an der selben Stelle getaetigt werden");
+                    document.getElementById("info").classList.add('alert');
+                    document.getElementById('info').innerHTML = '<strong>Hinweis:</strong> Es kann nur ein Eintrag an der selben Stelle getätigt werden!'; 
                 } else {
                     const name = document.getElementById('name').value;
                     const message = document.getElementById('message').value;
@@ -91,9 +95,11 @@
                         .bindPopup('<strong>' + name + '</strong>' + '<br>' + message); 
                 }
                 madeEntry = true;
-                alert('Eintrag wurde gespeichert');      
+                document.getElementById("info").classList.add('succes');
+                document.getElementById('info').innerHTML = '<strong>Erfolg:</strong> Eintrag wurde gespeichert!';
             } else {
-                alert('Bitte nur einen Eintrag pro Person');
+                document.getElementById("info").classList.add('alert');
+                document.getElementById('info').innerHTML = '<strong>Hinweis:</strong> Bitte nur einen Eintrag pro Person!';
             }
         }
 
@@ -101,7 +107,7 @@
             lastSelectedPosition = position;
         }
 
-        var map = L.map('map').setView([49.261101, 7.359755], 18);
+        var map = L.map('map').setView([49.261101, 7.359755], 18,);
 
 
         var tiles = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {

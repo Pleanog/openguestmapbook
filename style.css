@@ -17,21 +17,22 @@
 
 #map {
     width: 100%;
-    height: 550px;
-    border: #007466 solid 4px;
+    height: 800px;
+    border: #007466 solid 3px;
+    box-sizing: border-box;
 }
 
 .submit-button{
     background-color: #007466;
     color: white;
-    border: solid 0px navy;
+    border: solid 0px #007466;
     width: 100%;
     padding: 10px 35px;
     margin-top: 10px;
     font-size: 1rem;
 }
 .submit-button:hover {
-    background-color: #00665a;
+    background-color: #006355;
     cursor: pointer;
 }
 
@@ -79,4 +80,30 @@ input[type=text] {
 
 #message:focus {
     background-color: rgb(242, 242, 242);
+}
+
+#info{
+    /* margin: 0px; */
+    padding: 10px;
+    border-top: 3px solid #007466;
+    border-right: 3px solid #007466;
+    border-left: 3px solid #007466;
+}
+
+.alert{
+    background-color: rgb(255, 148, 148);
+    transition: background-color 0.5s;
+    color: rgb(74, 0, 0);
+}
+
+.tip {
+    background-color: rgb(255, 245, 137);
+    transition: background-color 0.5s;
+    color: rgb(97, 97, 0);
+}
+
+.succes{
+    background-color: rgb(195, 255, 169);
+    transition: background-color 0.5s;
+    color: rgb(0, 56, 0);
 }
