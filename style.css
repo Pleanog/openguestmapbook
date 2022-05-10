@@ -4,6 +4,10 @@
             margin: 0;
         }
 
+        * {
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+        }
         .leaflet-container {
             height: 400px;
             width: 600px;
@@ -13,17 +17,31 @@
 
 #map {
     width: 100%;
-    height: 100%;
+    height: 550px;
+    border: #007466 solid 4px;
 }
 
 .submit-button{
-    background-color: #2A7A84;
+    background-color: #007466;
     color: white;
     border: solid 0px navy;
-    border-radius: 5px;
-    padding: 5px 15px;
-    margin-left: 40%;
+    width: 100%;
+    padding: 10px 35px;
     margin-top: 10px;
+    font-size: 1rem;
+}
+.submit-button:hover {
+    background-color: #00665a;
+    cursor: pointer;
+}
+
+.guestbook_map_container {
+    padding: 25px;
+    background-color: rgb(242, 242, 242);
+}
+
+.guestbook-form{
+    padding-bottom: 25px;
 }
 
 input[type=text] {
@@ -31,4 +49,34 @@ input[type=text] {
     padding: 12px 20px;
     margin: 8px 0;
     box-sizing: border-box;
+    font-size: 1rem;
+}
+input[type=text]:hover {
+    background-color: rgb(242, 242, 242);
+}
+input[type=text]:focus {
+    background-color: rgb(242, 242, 242);
+}
+.guestbook_entry{
+    /* background-color: #2A7A84; */
+    padding: 10px;
+}
+
+input[type=text] {
+    border: none;
+    border-bottom: 2px solid #007466;
+}
+#message{
+    border: none;
+    border-bottom: 2px solid #007466;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+}
+#message:hover {
+    background-color: rgb(242, 242, 242);
+}
+
+#message:focus {
+    background-color: rgb(242, 242, 242);
 }

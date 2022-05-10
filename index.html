@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>OpenGestMapBook</title>
+    <title>OpenGuestMapBook</title>
 
     <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
@@ -18,28 +18,43 @@
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
 
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
 
 </head>
 
 <body>
 
 
-    
-    <div id="map"></div>
+    <div class="guestbook_map_container">
+        <div class="guestbook-form">
+            <form action="/action_page.php">
+                <label for="name">Name (optional)</label><br>
+                <input type="text" id="name" name="name" value=""><br>
+                <label for="message">Nachricht (optional):</label><br>
+                <textarea type="text" id="message" name="message" maxlength="300"></textarea>
+                <input class="submit-button" type="button" value="Speichern" onclick="saveDatainDatabase()">
+            </form>
+        </div>
+        <div id="map"></div>
+    </div>
 
 <script>
 
         var lastSelectedPosition;
         var lastSendPosition ;
+        var madeEntry = false;
 
         window.onload = function () {
             let listofvisitors = getDatainDatabase();
             drawVisitors(listofvisitors);
-        };      
+        };
 
         function drawVisitors(listofvisitors) {
             listofvisitors.forEach(function (e, index) {
                 L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
+                .bindPopup('<strong>' + listofvisitors[index].name + '</strong>' + '<br>' + listofvisitors[index].message);
             });
         }
 
@@ -51,16 +66,26 @@
         }
 
         function saveDatainDatabase(){
-                console.log(lastSelectedPosition);
-                console.log(lastSendPosition);
-            if (lastSelectedPosition == lastSendPosition){
-                console.log("verboten")
+            if(lastSelectedPosition == undefined){
+                alert('Bitte eine Position auf der Karte auswählen');
+            } else if (!madeEntry){
+                if (lastSelectedPosition == lastSendPosition){
+                    console.log("Es kann nur ein Eintrag an der selben Stelle getaetigt werden")
+                } else {
+                    const name = document.getElementById('name').value
+                    const message = document.getElementById('message').value
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", 'http://ogmb.kirtz.eu/create_entry.php', true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                    xhr.send(lastSelectedPosition, name, message);
+                    lastSendPosition = lastSelectedPosition;
+                    L.marker([lastSelectedPosition.lat, lastSelectedPosition.lng]).addTo(map)
+                        .bindPopup('<strong>' + name + '</strong>' + '<br>' + message); 
+                }
+                madeEntry = true;
+                alert('Eintrag wurde gespeichert');      
             } else {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", 'http://ogmb.kirtz.eu/create_entry.php', true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-            xhr.send(lastSelectedPosition);
-            lastSendPosition = lastSelectedPosition;
+                alert('Bitte nur einen Eintrag pro Person');
             }
         }
 
@@ -91,7 +116,7 @@
 
                 popup
                     .setLatLng(e.latlng)
-                    .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>ja</button>")
+                    .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>Speichern</button>")
                     .openOn(map);
             }
 
