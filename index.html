@@ -53,18 +53,27 @@
         };
 
         function drawVisitors(listofvisitors) {
+            
             listofvisitors.forEach(function (e, index) {
-                L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
-                .bindPopup('<strong>' + listofvisitors[index].name + '</strong>' + '<br>' + listofvisitors[index].message);
+
+                if (!listofvisitors[index].name && !listofvisitors[index].message) {
+                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map);
+                } else if (!listofvisitors[index].message) {
+                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
+                        .bindPopup('<strong>' + listofvisitors[index].name + '</strong>');
+                } else {
+                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
+                        .bindPopup('<strong>' + listofvisitors[index].name + '</strong> <br>' + listofvisitors[index].message);
+                }
             });
-        }
+        };
 
         function getDatainDatabase(){
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open("GET", '/read_entry.php', false); // false for synchronous request
             xmlHttp.send(null);
             return xmlHttp.responseText;
-        }
+        };
 
         function saveDatainDatabase(){
             document.getElementById("info").classList.remove('alert', 'succes', 'tip');
@@ -101,11 +110,11 @@
                 document.getElementById("info").classList.add('alert');
                 document.getElementById('info').innerHTML = '<strong>Hinweis:</strong> Bitte nur einen Eintrag pro Person!';
             }
-        }
+        };
 
         function savecurrentPosition(position){
             lastSelectedPosition = position;
-        }
+        };
 
         var map = L.map('map').setView([49.261101, 7.359755], 18,);
 
@@ -132,7 +141,7 @@
                     .setLatLng(e.latlng)
                     .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>Speichern</button>")
                     .openOn(map);
-            }
+            };
 
         map.on('click', onMapClick);
 
