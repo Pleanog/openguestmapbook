@@ -18,9 +18,9 @@
         integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
 
 </head>
 
@@ -41,49 +41,39 @@
         <div id="map"></div>
     </div>
 
-<script>
+    <script>
 
         var lastSelectedPosition;
-        var lastSendPosition ;
+        var lastSendPosition;
         var madeEntry = false;
 
         window.onload = function () {
-            let listofvisitors = getDatainDatabase();
+            let listofvisitors = getDatafromDatabase();
             drawVisitors(JSON.parse(listofvisitors).data);
         };
 
         function drawVisitors(listofvisitors) {
-            
             listofvisitors.forEach(function (e, index) {
-
-                if (!listofvisitors[index].name && !listofvisitors[index].message) {
-                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map);
-                } else if (!listofvisitors[index].message) {
-                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
-                        .bindPopup('<strong>' + listofvisitors[index].name + '</strong>');
-                } else {
-                    L.marker([listofvisitors[index].lat, listofvisitors[index].lng]).addTo(map)
-                        .bindPopup('<strong>' + listofvisitors[index].name + '</strong> <br>' + listofvisitors[index].message);
-                }
+                drawMakerOnPosition(e);
             });
         };
 
-        function getDatainDatabase(){
+        function getDatafromDatabase(position,) {
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open("GET", '/read_entry.php', false); // false for synchronous request
             xmlHttp.send(null);
             return xmlHttp.responseText;
         };
 
-        function saveDatainDatabase(){
+        function saveDatainDatabase() {
             document.getElementById("info").classList.remove('alert', 'succes', 'tip');
-            if(lastSelectedPosition == undefined){
+            if (lastSelectedPosition == undefined) {
                 document.getElementById("info").classList.add('tip');
-                document.getElementById('info').innerHTML = '<strong>Info:</strong> Bitte eine Position auf der Karte auswählen!';                
-            } else if (!madeEntry){
-                if (lastSelectedPosition == lastSendPosition){
+                document.getElementById('info').innerHTML = '<strong>Info:</strong> Bitte eine Position auf der Karte auswählen!';
+            } else if (!madeEntry) {
+                if (lastSelectedPosition == lastSendPosition) {
                     document.getElementById("info").classList.add('alert');
-                    document.getElementById('info').innerHTML = '<strong>Hinweis:</strong> Es kann nur ein Eintrag an der selben Stelle getätigt werden!'; 
+                    document.getElementById('info').innerHTML = '<strong>Hinweis:</strong> Es kann nur ein Eintrag an der selben Stelle getätigt werden!';
                 } else {
                     const name = document.getElementById('name').value;
                     const message = document.getElementById('message').value;
@@ -100,8 +90,14 @@
                     request.send(formData);
 
                     lastSendPosition = lastSelectedPosition;
-                    L.marker([lastSelectedPosition.lat, lastSelectedPosition.lng]).addTo(map)
-                        .bindPopup('<strong>' + name + '</strong>' + '<br>' + message); 
+
+                    let markerObject = {
+                        lat: lastSelectedPosition.lat,
+                        lng: lastSelectedPosition.lng,
+                        name: name,
+                        message: message,
+                    }
+                    drawMakerOnPosition(markerObject)
                 }
                 madeEntry = true;
                 document.getElementById("info").classList.add('succes');
@@ -112,8 +108,26 @@
             }
         };
 
-        function savecurrentPosition(position){
+        function savecurrentPosition(position) {
             lastSelectedPosition = position;
+        };
+
+        function drawMakerOnPosition(markerObject) {
+            var popuptext;
+            if (!markerObject.name && !markerObject.message) {
+                popuptext = '<i>Keine Nachricht hinterlassen</i>';
+            }
+            if (markerObject.name && !markerObject.message) {
+                popuptext = '<strong>' + markerObject.name + '</strong>';
+            }
+            if (!markerObject.name && markerObject.message) {
+                popuptext = markerObject.message;
+            }
+            if (markerObject.name && markerObject.message) {
+                popuptext = '<strong>' + markerObject.name + '</strong><br>' + markerObject.message;
+            }
+            L.marker([markerObject.lat, markerObject.lng]).addTo(map)
+                .bindPopup(popuptext);
         };
 
         var map = L.map('map').setView([49.261101, 7.359755], 18,);
@@ -133,15 +147,15 @@
 
         var popup = L.popup();
 
-            function onMapClick(e) {
-                
-                savecurrentPosition(e.latlng)
+        function onMapClick(e) {
 
-                popup
-                    .setLatLng(e.latlng)
-                    .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>Speichern</button>")
-                    .openOn(map);
-            };
+            savecurrentPosition(e.latlng)
+
+            popup
+                .setLatLng(e.latlng)
+                .setContent("<br>Gästebucheintrag hier speichern?<br><button onClick='saveDatainDatabase()' class='submit-button'>Speichern</button>")
+                .openOn(map);
+        };
 
         map.on('click', onMapClick);
 
